@@ -1,6 +1,9 @@
 const express = require('express');
 let router = express.Router();
 
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
+
 let ItemsData = [
     {
         id: "0",
@@ -15,22 +18,8 @@ let ItemsData = [
         sellername: "Bill BMW",
         sellermail: "Billruleforever@gmail.com",
         sellerphonenumber: "+44 23 448 112"
-    },
-
-    {
-        id: "1",
-        title: "Selling used boat",
-        description: "Used boat",
-        category: "Boats",
-        location: "London,YK2",
-        images: "asd123asd123asd123",
-        askingprice: 2000,
-        dateofposting: 1591012800,
-        deliverytype: "Pickup",
-        sellername: "Bill BMW",
-        sellermail: "Billruleforever@gmail.com",
-        sellerphonenumber: "+44 23 448 112"
     }
+    
   ];
   
   let ItemObject = {
@@ -49,6 +38,7 @@ let ItemsData = [
   };
 
 
+
 router
 .route('')
 .get((req, res) => {
@@ -58,14 +48,18 @@ router
 router
 .route('/:id')
 .get((req, res) => {
+
     let params = req.params;
     console.log(params.id)
+    //ItemsData = ItemsData[params.id]
     res.json(ItemsData[params.id]);
 });
 
 router
 .route('/create')
-.post((req, res) => {
+.post(
+    passport.authenticate('basic', { session: false }),
+    (req, res) => {
           
     ItemsData.push({
         id: ItemsData.length,
@@ -93,7 +87,7 @@ router
 
     var result = ItemsData.filter(obj => obj.category === category2.category)
     console.log(result)
-    res.json(result);
+    res.json({result});
 })
 
 
@@ -106,7 +100,7 @@ router
 
     var result = ItemsData.filter(obj => obj.location === location2.location)
     console.log(result)
-    res.json(result);
+    res.json({result});
 })
 
 //search dateofposting
@@ -119,12 +113,14 @@ router
 
     var result = ItemsData.filter(obj => obj.dateofposting === parseInt(dateofposting2.dateofposting))
     console.log(result)
-    res.json(result);
+    res.json({result});
 })
 
 router
 .route('/change/:id')
-.put((req,res) => {
+.put(
+    passport.authenticate('basic', { session: false }),
+    (req,res) => {
     let Itemid = req.params;
     
     ItemsData[Itemid.id] = 
@@ -148,7 +144,9 @@ router
 
 router
 .route('/delete/:id')
-.delete((req, res) => {
+.delete(
+    passport.authenticate('basic', { session: false }),
+    (req, res) => {
     let Itemid = req.params;
     
     console.log(Itemid.id);

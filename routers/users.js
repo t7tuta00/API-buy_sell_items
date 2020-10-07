@@ -1,7 +1,14 @@
 const express = require('express');
+var bodyParser = require('body-parser')
+const bcrypt = require('bcryptjs');
 let router = express.Router();
 
-let Userdata = [
+const users2 = require('./users2');
+
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
+
+/*let Userdata = [
     {
         id: 0,
         username: "Kilpikalevi",
@@ -13,8 +20,9 @@ let Userdata = [
         password: "Salis12",
         dateofbirth: "12.12.1990"
     }
-  ];
+  ];*/
   
+  /*
   let userObject = {
         "id": 0,
         "username": "Kilpikalevi",
@@ -25,29 +33,35 @@ let Userdata = [
         "email": "Apina@gmail.com",
         "password": "Salis12",
         "dateofbirth": "12.12.1990"
-  };
+  };*/
+
 
 router
 .route('')
-.get((req, res) => {
-    res.json({Userdata});
+.get(
+    passport.authenticate('basic', { session: false }),
+    (req, res) => {
+    let user = users2.getAllUsers()
+    res.json({user});
 });
   
 router
 .route('/createuser')
-.post((req, res) => {
-  
-    Userdata.push({
-        id: Userdata.length,
-        username: req.body.username,
-        name: req.body.name,
-        streetaddress: req.body.streetaddress,
-        city: req.body.city,
-        country: req.body.country,
-        email: req.body.email,
-        password: req.body.password,
-        dateofbirth: req.body.dateofbirth
-      })
+.post(
+    passport.authenticate('basic', { session: false }),
+    (req, res) => {
+
+      const hashedPassword = bcrypt.hashSync(req.body.password, 6);
+      users2.addUser(
+          req.body.username,
+          req.body.email,
+          hashedPassword,
+          req.body.name,
+          req.body.streetaddress,
+          req.body.city,
+          req.body.country,
+          req.body.dateofbirth
+          )
       res.sendStatus(201);
   });
   

@@ -7,7 +7,7 @@ let LoginData = [
     {
         id: 0,
         username: "Kalevi",
-        password: "Salis"
+        password: "Salis",
     }
   ];
   
@@ -17,10 +17,14 @@ let LoginData = [
         "password": "string"
   };
 
+
 router
 .route('')
   .get((req, res) => {
     res.json({LoginData});
   });
+
+  //TURHA
+
 
 module.exports = router;
