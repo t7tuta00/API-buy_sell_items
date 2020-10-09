@@ -201,7 +201,7 @@ router
     (req, res) => {
     
         db.query('DELETE FROM items WHERE id = ?',[req.params.id]);
-        db.query('ALTER TABLE items AUTO_INCREMENT=?',[req.params.id-1]); 
+        db.query('ALTER TABLE items AUTO_INCREMENT=?',[(req.params.id-1)]); 
         /*let Itemid = req.params;
     
         console.log(Itemid.id);
@@ -209,7 +209,7 @@ router
 
         ItemsData.splice(Itemid.id,ItemsData.length);
         console.log(ItemsData);*/
-        res.send("Deleted row");
+        res.sendStatus(200);
     })
 
 module.exports = router;

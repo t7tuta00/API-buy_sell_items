@@ -32,7 +32,5 @@ router
     res.json({LoginData});
   });
 
-  //TURHA
-
 
 module.exports = router;
