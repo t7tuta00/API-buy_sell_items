@@ -4,9 +4,14 @@ const { assert } = require('console');
 const users2 = require('../routers/users2');
 chai.use(chaiHttp);
 const server = require('../server');
+const db = require('../routers/db');
 
 const expect = chai.expect;
 const apiAddress = 'http://localhost:3000';
+
+const passport = require('passport');
+const { use } = require('chai');
+const BasicStrategy = require('passport-http').BasicStrategy;
 
 
 describe('test operations', function() {
@@ -22,8 +27,8 @@ describe('test operations', function() {
   
   
   
-  
-  /*describe('Login Get-method', function() {
+  /*
+  describe('Login Get-method', function() {
 
     it('Get-method test for /login', async function() {
       await chai.request(apiAddress)
@@ -41,9 +46,9 @@ describe('test operations', function() {
         .catch(error => {
           expect.fail(error)
         })
-    })*/
+    })
 
-    /*it('POST-method,Should add a new user by addUser with user2.js', async function() {
+    it('POST-method,Should add a new user by addUser with user2.js', async function() {
       await chai.request(apiAddress)
         .post('/registerBasic')
         .send({
@@ -69,18 +74,26 @@ describe('test operations', function() {
     })
   });*/
 
-  describe('User Get-,Post-methods', function() {
+  var value;
+  var value2;
+  var storedresponse;
+  var storedLenght;
+
+  
+  describe('User Get-,Post-,Delete-methods', function() {
 
     it('GET-method test for /users', async function() {
+      this.timeout(3000);
       await chai.request(apiAddress)
         .get('/users')
         .auth('tester', 'testerpassword')
         .then(response => {
           expect(response.status).to.equal(200);
+          //console.log("____"+response+"_____");
           expect(response.body).to.be.a('object');
-          console.log(response.body);
           expect(response.body).to.have.a.property('user');
           expect(response.body.user).to.be.a('array');
+          //console.log(response.body.user);
           expect(response.body.user[0]).to.be.a('object');
           expect(response.body.user[0]).to.have.a.property('id');
           expect(response.body.user[0]).to.have.a.property('username');
@@ -91,15 +104,16 @@ describe('test operations', function() {
           expect(response.body.user[0]).to.have.a.property('city');
           expect(response.body.user[0]).to.have.a.property('country');
           expect(response.body.user[0]).to.have.a.property('dateofbirth');
-          expect(response.body.user[0]).to.have.a.property('validApiKey');
-
+          //expect(response.body.user[0]).to.have.a.property('validApiKey');
         })
         .catch(error => {
           expect.fail(error)
         })
     })
   
+    
     it('POST-method,Should add a new user by createuser', async function() {
+      this.timeout(5000);
       await chai.request(apiAddress)
         .post('/users/createuser')
         .auth('tester', 'testerpassword')
@@ -118,8 +132,14 @@ describe('test operations', function() {
           return chai.request(apiAddress)
           .get('/users')
           .auth('tester', 'testerpassword');
+          
         })
         .then(readResponse => {
+          //console.log(readResponse);
+          //console.log("________"+readResponse.body.user.length);
+          //console.log(readResponse.body.user);
+          //console.log(readResponse.body.user[1].id);
+
           expect(readResponse.body.user[readResponse.body.user.length-1].username).to.equal("TestiKalle");
           expect(readResponse.body.user[readResponse.body.user.length-1].email).to.equal("kalle@gmail.com");
           expect(readResponse.body.user[readResponse.body.user.length-1].name).to.equal("Kalle");
@@ -127,18 +147,54 @@ describe('test operations', function() {
           expect(readResponse.body.user[readResponse.body.user.length-1].city).to.equal("Kallekaupunki");
           expect(readResponse.body.user[readResponse.body.user.length-1].country).to.equal("Kallemaa");
           expect(readResponse.body.user[readResponse.body.user.length-1].dateofbirth).to.equal("01.01.1000");
+          
+          //console.log("delete testuser2");
+          //console.log(readResponse.body.user[1].id);
+          //console.log(readResponse.body.user[1].id-1); 
+          
+        })
+        
+        .catch(error => {
+          expect.fail(error)
+        })
+
+    })
+
+    it('Delete-method,Should delete a user', async function() {
+      this.timeout(3000);
+      await chai.request(apiAddress)
+        .get('/users')
+        .auth('tester', 'testerpassword')
+        .then(response => {
+          expect(response.status).to.equal(200);
+          expect(response.body).to.be.a('object');
+          expect(response.body).to.have.a.property('user');
+          expect(response.body.user).to.be.a('array');
+          
+          storedresponse = response.body.user;
+          storedLenght = response.body.user.length;
+
+          //db.query("ALTER TABLE users AUTO_INCREMENT=" + storedLenght-1);
+
+          return chai.request(apiAddress)
+          .delete('/users/delete/'+storedLenght)
+          .auth('tester', 'testerpassword');
+          
+
         })
         .catch(error => {
           expect.fail(error)
         })
-    })
-  })
 
-  let storedTodos = null;
-/*
-  describe('Items GET-,POST-,PUT-,DELETE-methods', function() {
+    })
+})
+
+
+  
+  describe('Items GET-,POST-,PUT-,PUT2-,DELETE-methods', function() {
 
     it('GET-method: test for /items', async function() {
+      //this.timeout(3000);
       await chai.request(apiAddress)
         .get('/items')
         .then(response => {
@@ -166,58 +222,71 @@ describe('test operations', function() {
         })
     })
 
+
     it('GET-method: test for /items/:id', async function() {
+      //this.timeout(3000);
       await chai.request(apiAddress)
         .get('/items/'+storedTodos[0].id)
         .then(response => {
           expect(response.status).to.equal(200);
           expect(response.body).to.be.a('object');
-          expect(response.body).to.have.a.property('id');
-          expect(response.body).to.have.a.property('title');
-          expect(response.body).to.have.a.property('description');
-          expect(response.body).to.have.a.property('category');
-          expect(response.body).to.have.a.property('location');
-          expect(response.body).to.have.a.property('images');
-          expect(response.body).to.have.a.property('askingprice');
-          expect(response.body).to.have.a.property('dateofposting');
-          expect(response.body).to.have.a.property('deliverytype');
-          expect(response.body).to.have.a.property('sellername');
-          expect(response.body).to.have.a.property('sellermail');
-          expect(response.body).to.have.a.property('sellerphonenumber');
+          console.log(response.body);
+          expect(response.body).to.have.a.property('ItemsData');
+          expect(response.body.ItemsData).to.be.a('array');
+          expect(response.body.ItemsData[0]).to.be.a('object');
+          expect(response.body.ItemsData[0]).to.have.a.property('id');
+          expect(response.body.ItemsData[0]).to.have.a.property('title');
+          expect(response.body.ItemsData[0]).to.have.a.property('description');
+          expect(response.body.ItemsData[0]).to.have.a.property('category');
+          expect(response.body.ItemsData[0]).to.have.a.property('location');
+          expect(response.body.ItemsData[0]).to.have.a.property('images');
+          expect(response.body.ItemsData[0]).to.have.a.property('askingprice');
+          expect(response.body.ItemsData[0]).to.have.a.property('dateofposting');
+          expect(response.body.ItemsData[0]).to.have.a.property('deliverytype');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellername');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellermail');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellerphonenumber');
         })
         .catch(error => {
           expect.fail(error)
         })
     })
+
   
-    it('POST-method:Should add a new user by create', async function() {
+  
+    it('POST-method:Should add a new item by create', async function() {
+      this.timeout(5000);
       await chai.request(apiAddress)
         .post('/items/create')
+        .auth('tester', 'testerpassword')
         .send({
             title: "Selling used radio",
             description: "Used radio",
             category: "Radio",
             location: "Oulu,FIN",
             images: "asd123asd123asd123",
-            askingprice: 100,
-            dateofposting: 1591012800,
+            askingprice: "100",
+            dateofposting: "1591012800",
             deliverytype: "Pickup",
             sellername: "Kalle Kovapää",
             sellermail: "Kalle60@gmail.com",
             sellerphonenumber: "+358 40 123 123"
         })
         .then(response => {
+          //this.timeout(2000);
           expect(response.status).to.equal(201);
           return chai.request(apiAddress).get('/items');
         })
         .then(readResponse => {
+          //console.log(readResponse.body.ItemsData);
+          //console.log("!!!!!!!!!!!!!!!"+readResponse.body.ItemsData.length);
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].title).to.equal("Selling used radio");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].description).to.equal("Used radio");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].category).to.equal("Radio");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].location).to.equal("Oulu,FIN");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].images).to.equal("asd123asd123asd123");
-          expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].askingprice).to.equal(100);
-          expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].dateofposting).to.equal(1591012800);
+          expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].askingprice).to.equal("100");
+          expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].dateofposting).to.equal("1591012800");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].deliverytype).to.equal("Pickup");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].sellername).to.equal("Kalle Kovapää");
           expect(readResponse.body.ItemsData[readResponse.body.ItemsData.length-1].sellermail).to.equal("Kalle60@gmail.com");
@@ -228,76 +297,91 @@ describe('test operations', function() {
         })
     })
 
+    
     it('PUT-method: Should edit object', async function() {
+      this.timeout(3000);
       await chai.request(apiAddress)
-        .put('/items/change/' + storedTodos[0].id)
-        //.set('Authorization', 'Bearer ' + userJwt)
+        .put('/items/change/1')
+        .auth('tester', 'testerpassword')
         .send({
-          title: "Selling used boat,UPDATED",
-          description: "Used boat,UPDATED",
-          category: "Boats",
-          location: "London,YK",
-          images: "asd123asd123asd123,UPDATED",
-          askingprice: 2000,
-          dateofposting: 1591012800,
-          deliverytype: "Pickup,UPDATED",
-          sellername: "Bill BMW,UPDATED",
-          sellermail: "Billruleforever@gmail.com",
-          sellerphonenumber: "+44 23 448 112,UPDATED"
+            title: "Selling used car",
+            description: "Used BMW 1995, black, diesel, etc.",
+            category: "Cars",
+            location: "London,YK",
+            images: "asd123asd123asd123",
+            askingprice: "2000",
+            dateofposting: "1591012800",
+            deliverytype: "Pickup",
+            sellername: "Bill BMW",
+            sellermail: "Billruleforever@gmail.com",
+            sellerphonenumber: "+44 23 448 112"
         })
         .then(response => {
           expect(response).to.have.property('status');
-          expect(response.status).to.equal(200);
+          expect(response.status).to.equal(201);
+          //this.timeout(3000);
           return chai.request(apiAddress)
-          .get('/items/' + storedTodos[0].id)
-            //.set('Authorization', 'Bearer ' + userJwt);
+          .get('/items/1')
+            
         })
         .then(checkResponse => {
-          // Check that description is not changed
-          expect(checkResponse.body).to.have.property('category');
-          //expect(checkResponse.body.description).to.equal(storedTodos[0].description);
+          console.log(checkResponse.body);
+          expect(checkResponse.body).to.have.a.property('ItemsData');
+          expect(checkResponse.body.ItemsData).to.be.a('array');
+          
+          expect(checkResponse.body.ItemsData[checkResponse.body.ItemsData.length-1].title).to.equal("Selling used car");
         })
         .catch(error => {
-          assert.fail(error);
+          expect.fail(error);
         });
     });
 
-    it('DELETE-method: Should delete a object', async function() {
+    it('Delete-method,Should delete a item', async function() {
+      this.timeout(3000);
       await chai.request(apiAddress)
-        //console.log(storedTodos)
-        .delete('/items/delete/' + storedTodos[0].id)
-        //.set('Authorization', 'Bearer ' + userJwt)
+        .get('/items')
+        .auth('tester', 'testerpassword')
         .then(response => {
-          expect(response).to.have.property('status');
           expect(response.status).to.equal(200);
+          expect(response.body).to.be.a('object');
+          expect(response.body).to.have.a.property('ItemsData');
+          expect(response.body.ItemsData).to.be.a('array');
+          
+          storedresponse = response.body.ItemsData;
+          storedLenght = response.body.ItemsData.length;
+
+          //db.query('ALTER TABLE users AUTO_INCREMENT=?'),[storedLenght-1];
+          //db.query("ALTER TABLE users AUTO_INCREMENT=" + storedLenght-1);
+
           return chai.request(apiAddress)
-            .get('/items' + storedTodos[0].id)
-            //.set('Authorization', 'Bearer ' + userJwt);
-        })
-        .then(checkResponse => {
-          expect(checkResponse).to.have.property('status');
-          expect(checkResponse.status).to.equal(404);
+          .delete('/items/delete/'+storedLenght)
+          .auth('tester', 'testerpassword');
+
         })
         .catch(error => {
-          assert.fail(error);
-        });
+          expect.fail(error)
+        })
+
     })
+
   })
 
   describe('GET-,POST-Methods for /items/search', function() {
 
     it('POST-method: Should add item and GET-method for checking search/category', async function() {
+      this.timeout(5000);
       await chai.request(apiAddress)
         .post('/items/create')
-        //.set('Authorization', 'Bearer ' + userJwt)
+        .auth('tester', 'testerpassword')
+        
         .send({
           title: "Selling used bike",
           description: "Used bike",
           category: "Bikes",
           location: "London,YK",
           images: "asd123asd123asd123",
-          askingprice: 2000,
-          dateofposting: 1591012800,
+          askingprice: "2000",
+          dateofposting: "1591012800",
           deliverytype: "Pickup",
           sellername: "Jack Ruthless",
           sellermail: "Jack@gmail.com",
@@ -306,62 +390,73 @@ describe('test operations', function() {
         .then(response => {
           expect(response).to.have.property('status');
           expect(response.status).to.equal(201);
+          this.timeout(3000);
           return chai.request(apiAddress)
           .get('/items/search/category/Bikes')
-            //.set('Authorization', 'Bearer ' + userJwt);
         })
         .then(checkResponse => {
           expect(checkResponse.body).to.be.a('object');
-          expect(checkResponse.body).to.have.a.property('result');
-          expect(checkResponse.body.result).to.be.a('array');
+          console.log(checkResponse.body);
+
+          expect(checkResponse.body).to.have.a.property('ItemsData');
+          expect(checkResponse.body.ItemsData).to.be.a('array');
           //console.log(checkResponse)
-          //console.log(checkResponse.body)
-          expect(checkResponse.body.result[0]).to.be.a('object');
+          
+          //console.log(checkResponse.body.ItemsData[0].sellername);
 
-          expect(checkResponse.body.result[0]).to.have.a.property('id');
-          expect(checkResponse.body.result[0]).to.have.a.property('title');
-          expect(checkResponse.body.result[0]).to.have.a.property('description');
-          expect(checkResponse.body.result[0]).to.have.a.property('category');
-          expect(checkResponse.body.result[0]).to.have.a.property('location');
-          expect(checkResponse.body.result[0]).to.have.a.property('images');
-          expect(checkResponse.body.result[0]).to.have.a.property('askingprice');
-          expect(checkResponse.body.result[0]).to.have.a.property('dateofposting');
-          expect(checkResponse.body.result[0]).to.have.a.property('deliverytype');
-          expect(checkResponse.body.result[0]).to.have.a.property('sellername');
-          expect(checkResponse.body.result[0]).to.have.a.property('sellermail');
-          expect(checkResponse.body.result[0]).to.have.a.property('sellerphonenumber');
+          //expect(checkResponse.body.results[0]).to.be.a('object');
 
-          expect(checkResponse.body.result[0]).to.have.a.property('category') == 'Bikes';
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('id');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('title');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('description');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('category');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('location');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('images');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('askingprice');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('dateofposting');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('deliverytype');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('sellername');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('sellermail');
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('sellerphonenumber');
+
+          expect(checkResponse.body.ItemsData[0]).to.have.a.property('category') == 'Bikes';
+          storedresponse = checkResponse.body.ItemsData;
+          storedLenght = (checkResponse.body.ItemsData.length+1);
+          console.log("___________")
+          console.log(storedLenght);
+
         })
         .catch(error => {
           expect.fail(error);
         });
     });
 
+    
     it('GET-method: test search/location', async function() {
+      this.timeout(3000);
       await chai.request(apiAddress)
         .get('/items/search/location/London,YK')
         .then(response => {
           expect(response.status).to.equal(200);
           expect(response.body).to.be.a('object');
-          expect(response.body).to.have.a.property('result');
-          expect(response.body.result).to.be.a('array');
-          expect(response.body.result[0]).to.be.a('object');
-          //console.log(response.body)
-          expect(response.body.result[0]).to.have.a.property('id');
-          expect(response.body.result[0]).to.have.a.property('title');
-          expect(response.body.result[0]).to.have.a.property('description');
-          expect(response.body.result[0]).to.have.a.property('category');
-          expect(response.body.result[0]).to.have.a.property('location');
-          expect(response.body.result[0]).to.have.a.property('images');
-          expect(response.body.result[0]).to.have.a.property('askingprice');
-          expect(response.body.result[0]).to.have.a.property('dateofposting');
-          expect(response.body.result[0]).to.have.a.property('deliverytype');
-          expect(response.body.result[0]).to.have.a.property('sellername');
-          expect(response.body.result[0]).to.have.a.property('sellermail');
-          expect(response.body.result[0]).to.have.a.property('sellerphonenumber');
+          expect(response.body).to.have.a.property('ItemsData');
+          expect(response.body.ItemsData).to.be.a('array');
+          //expect(response.body.ItemsData[0]).to.be.a('object');
+          
+          expect(response.body.ItemsData[0]).to.have.a.property('id');
+          expect(response.body.ItemsData[0]).to.have.a.property('title');
+          expect(response.body.ItemsData[0]).to.have.a.property('description');
+          expect(response.body.ItemsData[0]).to.have.a.property('category');
+          expect(response.body.ItemsData[0]).to.have.a.property('location');
+          expect(response.body.ItemsData[0]).to.have.a.property('images');
+          expect(response.body.ItemsData[0]).to.have.a.property('askingprice');
+          expect(response.body.ItemsData[0]).to.have.a.property('dateofposting');
+          expect(response.body.ItemsData[0]).to.have.a.property('deliverytype');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellername');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellermail');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellerphonenumber');
 
-          expect(response.body.result[0]).to.have.a.property('category') == 'London,YK';
+          expect(response.body.ItemsData[0]).to.have.a.property('category') == 'London,YK';
         })
         .catch(error => {
           expect.fail(error)
@@ -369,29 +464,30 @@ describe('test operations', function() {
     })
 
     it('GET-method: test search/dateofposting', async function() {
+      this.timeout(3000);
       await chai.request(apiAddress)
         .get('/items/search/dateofposting/1591012800')
         .then(response => {
           expect(response.status).to.equal(200);
           expect(response.body).to.be.a('object');
-          expect(response.body).to.have.a.property('result');
-          expect(response.body.result).to.be.a('array');
-          expect(response.body.result[0]).to.be.a('object');
+          expect(response.body).to.have.a.property('ItemsData');
+          expect(response.body.ItemsData).to.be.a('array');
+          expect(response.body.ItemsData[0]).to.be.a('object');
           //console.log(response.body)
-          expect(response.body.result[0]).to.have.a.property('id');
-          expect(response.body.result[0]).to.have.a.property('title');
-          expect(response.body.result[0]).to.have.a.property('description');
-          expect(response.body.result[0]).to.have.a.property('category');
-          expect(response.body.result[0]).to.have.a.property('location');
-          expect(response.body.result[0]).to.have.a.property('images');
-          expect(response.body.result[0]).to.have.a.property('askingprice');
-          expect(response.body.result[0]).to.have.a.property('dateofposting');
-          expect(response.body.result[0]).to.have.a.property('deliverytype');
-          expect(response.body.result[0]).to.have.a.property('sellername');
-          expect(response.body.result[0]).to.have.a.property('sellermail');
-          expect(response.body.result[0]).to.have.a.property('sellerphonenumber');
+          expect(response.body.ItemsData[0]).to.have.a.property('id');
+          expect(response.body.ItemsData[0]).to.have.a.property('title');
+          expect(response.body.ItemsData[0]).to.have.a.property('description');
+          expect(response.body.ItemsData[0]).to.have.a.property('category');
+          expect(response.body.ItemsData[0]).to.have.a.property('location');
+          expect(response.body.ItemsData[0]).to.have.a.property('images');
+          expect(response.body.ItemsData[0]).to.have.a.property('askingprice');
+          expect(response.body.ItemsData[0]).to.have.a.property('dateofposting');
+          expect(response.body.ItemsData[0]).to.have.a.property('deliverytype');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellername');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellermail');
+          expect(response.body.ItemsData[0]).to.have.a.property('sellerphonenumber');
 
-          expect(response.body.result[0]).to.have.a.property('dateofposting') == 1591012800;
+          expect(response.body.ItemsData[0]).to.have.a.property('dateofposting') == "1591012800";
         })
         .catch(error => {
           expect.fail(error)
@@ -399,9 +495,29 @@ describe('test operations', function() {
     })
 
     
+   
+
+    it('Delete-method,Should delete a item2 in searchtest', async function() {
+      this.timeout(3000);
+      await chai.request(apiAddress)
+        .delete('/items/delete/'+storedLenght)
+        .auth('tester', 'testerpassword')
+        .then(response => {
+          expect(response.status).to.equal(200);
+          
+        })
+        .catch(error => {
+          expect.fail(error)
+        })
+
+    })
 
   
-  })*/
+
+    
+
+  
+  })
 
 });
 

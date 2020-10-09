@@ -5,6 +5,7 @@ info:
   contact:
     name: Taneli Turpeinen
     email: t7tuta00@students.oamk.fi
+  description: Api-Buy-Sell like ebay''
 servers:
   - url: 'http://localhost:3000'
 paths:
@@ -25,8 +26,7 @@ paths:
         '500':
           description: Internal Server Error
       description: 'Userlogin with Api-key '
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -35,46 +35,79 @@ paths:
             examples:
               example-1:
                 value:
-                  id: string
+                  id: 0
                   username: string
                   password: string
         description: ''
-  /createuser:
+  /users/createuser:
     post:
       summary: ''
       operationId: post-createUser
       responses:
-        '200':
-          description: 'Ok, user created'
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
       description: 'Create a new user for API '
-      security:
-        - API Key - 1: []
-      parameters:
-        - schema:
-            type: string
-          in: header
+      security: []
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login'
+              $ref: '#/components/schemas/Createuser'
+            examples: {}
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Createuser'
             examples:
               example-1:
                 value:
-                  id: string
+                  id: 0
                   username: string
+                  name: string
+                  streetaddress: string
+                  city: string
+                  country: string
+                  email: string
                   password: string
+                  dateofbirth: string
         description: ''
     parameters: []
-  /Items:
+  /items:
     get:
       summary: Your GET endpoint
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items'
+              examples:
+                example-1:
+                  value:
+                    id: string
+                    title: string
+                    description: string
+                    category: string
+                    location: string
+                    images: string
+                    askingprice: 0
+                    dateofposting: 0
+                    deliverytype: string
+                    sellername: string
+                    sellermail: string
+                    sellerphonenumber: string
+        '500':
+          description: Internal Server Error
       operationId: get-Item
       description: Get all Items
     parameters: []
-  /Items/create:
+  /items/create:
     post:
       summary: ''
       operationId: post-Items-createitem
@@ -94,7 +127,7 @@ paths:
             examples:
               example-1:
                 value:
-                  id: 0
+                  id: '0'
                   title: string
                   description: string
                   category: string
@@ -106,10 +139,9 @@ paths:
                   sellername: string
                   sellermail: string
                   sellerphonenumber: string
-      security:
-        - API Key - 1: []
+      security: []
     parameters: []
-  /Items/change:
+  /items/change:
     put:
       summary: ''
       operationId: put-Items-changeitem
@@ -121,8 +153,7 @@ paths:
         '500':
           description: Internal Server Error
       description: 'PUT-method: Change item'
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -130,11 +161,11 @@ paths:
               type: object
               properties:
                 id:
-                  type: object
+                  type: string
             examples:
               example-1:
                 value:
-                  id: 0
+                  id: '0'
         description: ''
     parameters: []
   /items/delete:
@@ -149,8 +180,7 @@ paths:
         '500':
           description: Internal Server Error
       description: Delete-method
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -164,7 +194,7 @@ paths:
                 value:
                   id: 0
         description: ''
-  /search/category:
+  /items/search/category:
     get:
       summary: Your GET endpoint
       tags: []
@@ -178,7 +208,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 0
+                    id: '0'
                     title: string
                     description: string
                     category: string
@@ -195,8 +225,7 @@ paths:
         '500':
           description: Internal Server Error
       operationId: get-search-category
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -209,7 +238,8 @@ paths:
               example-1:
                 value:
                   category: string
-  /search/location:
+    parameters: []
+  /items/search/location:
     get:
       summary: Your GET endpoint
       tags: []
@@ -223,7 +253,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 0
+                    id: '0'
                     title: string
                     description: string
                     category: string
@@ -240,8 +270,7 @@ paths:
         '500':
           description: Internal Server Error
       operationId: get-search-location
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -255,7 +284,8 @@ paths:
                 value:
                   location: string
         description: ''
-  /search/dateofposting:
+    parameters: []
+  /items/search/dateofposting:
     get:
       summary: Your GET endpoint
       tags: []
@@ -269,7 +299,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 0
+                    id: '0'
                     title: string
                     description: string
                     category: string
@@ -286,8 +316,7 @@ paths:
         '500':
           description: Internal Server Error
       operationId: get-search-dateofposting
-      security:
-        - API Key - 1: []
+      security: []
       requestBody:
         content:
           application/json:
@@ -300,23 +329,78 @@ paths:
               example-1:
                 value:
                   dateofposting: string
+    parameters: []
+  /users:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+              examples:
+                example-1:
+                  value:
+                    id: 0
+                    username: string
+                    name: string
+                    streetaddress: string
+                    city: string
+                    country: string
+                    email: string
+                    password: string
+                    dateofbirth: string
+      operationId: get-users
+      description: Get user list
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /users/delete:
+    delete:
+      summary: ''
+      operationId: delete-users-delete
+      responses:
+        '200':
+          description: Deleted user.
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      description: Delete-method for users
+      security:
+        - API Key - 1: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
 components:
   schemas:
     Login:
       title: Login
       type: object
+      x-examples:
+        example-1:
+          id: 0
+          username: string
+          password: string
       properties:
         id:
-          type: string
+          type: integer
         username:
           type: string
         password:
           type: string
-      x-examples:
-        example-1:
-          id: '0'
-          username: Kilpikalevi
-          password: salasana1
     Items:
       title: Items
       type: object
@@ -336,7 +420,7 @@ components:
           sellerphonenumber: +44 23 448 112
       properties:
         id:
-          type: number
+          type: string
         title:
           type: string
         description:
@@ -358,6 +442,72 @@ components:
         sellermail:
           type: string
         sellerphonenumber:
+          type: string
+    Createuser:
+      title: Createuser
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+        name:
+          type: string
+        streetaddress:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        dateofbirth:
+          type: string
+      x-examples:
+        example-1:
+          id: 0
+          username: string
+          name: string
+          streetaddress: string
+          city: string
+          country: string
+          email: string
+          password: string
+          dateofbirth: string
+    Users:
+      title: Users
+      type: object
+      x-examples:
+        example-2:
+          id: 0
+          username: string
+          name: string
+          streetaddress: string
+          city: string
+          country: string
+          email: string
+          password: string
+          dateofbirth: string
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+        name:
+          type: string
+        streetaddress:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        dateofbirth:
           type: string
   securitySchemes:
     API Key - 1:

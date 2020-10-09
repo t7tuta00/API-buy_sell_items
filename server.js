@@ -8,6 +8,7 @@ const port = 3000
 const users = require('./routers/users');
 const items = require('./routers/items');
 const users2 = require('./routers/users2');
+const db = require('./routers/db');
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -21,9 +22,9 @@ const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
 
 passport.use(new BasicStrategy(
-  function(username, password, done) {
+  async function(username, password, done) {
 
-    const user = users2.getUserByName(username);
+    const user = await users2.getUserByName(username);
     if(user == undefined) {
       // Username not found
       console.log("HTTP Basic username not found");
@@ -40,13 +41,13 @@ passport.use(new BasicStrategy(
   }
 ));
 
-/*app.get('/httpBasicProtectedResource',
+app.get('/httpBasicProtectedResource',
         passport.authenticate('basic', { session: false }),
         (req, res) => {
   res.json({
     yourProtectedResource: "profit"
   });
-});*/
+});
 
 
 let apiInstance = null;

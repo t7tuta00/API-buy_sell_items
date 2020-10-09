@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 let router = express.Router();
 
 const users2 = require('./users2');
+const db = require('./db');
 
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
@@ -35,14 +36,20 @@ const BasicStrategy = require('passport-http').BasicStrategy;
         "dateofbirth": "12.12.1990"
   };*/
 
-
+//toimii
 router
 .route('')
 .get(
     passport.authenticate('basic', { session: false }),
     (req, res) => {
-    let user = users2.getAllUsers()
-    res.json({user});
+    db.query('SELECT * FROM users;').then(results => {
+        res.json({ user: results})
+    })
+    .catch(() => {
+        res.sendStatus(500);
+    })
+    /*let user = users2.getAllUsers()
+    res.json({user});*/
 });
   
 router
@@ -64,5 +71,23 @@ router
           )
       res.sendStatus(201);
   });
+
+  router
+.route('/delete/:id')
+.delete(
+    passport.authenticate('basic', { session: false }),
+    (req, res) => {
+    
+        db.query('DELETE FROM users WHERE id = ?',[req.params.id]);
+        db.query('ALTER TABLE items AUTO_INCREMENT=?',[req.params.id-1]); 
+        /*let Itemid = req.params;
+    
+        console.log(Itemid.id);
+        console.log(ItemsData[Itemid.id]);
+
+        ItemsData.splice(Itemid.id,ItemsData.length);
+        console.log(ItemsData);*/
+        res.send("Deleted row");
+    })
   
   module.exports = router;

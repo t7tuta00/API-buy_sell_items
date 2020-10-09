@@ -1,5 +1,13 @@
+/***
+ * UNSUSED AND BORING
+ * 
+ * 
+ */
+
+
 const { text } = require('body-parser');
 const express = require('express');
+const db = require('./db');
 
 let router = express.Router();
 
