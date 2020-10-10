@@ -1,6 +1,8 @@
 const express = require('express')
 var bodyParser = require('body-parser')
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const fetch = require("node-fetch");
 const app = express()
 const port = 3000
 
@@ -9,7 +11,6 @@ const users = require('./routers/users');
 const items = require('./routers/items');
 const users2 = require('./routers/users2');
 const db = require('./routers/db');
-
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -41,12 +42,24 @@ passport.use(new BasicStrategy(
   }
 ));
 
-app.get('/httpBasicProtectedResource',
-        passport.authenticate('basic', { session: false }),
-        (req, res) => {
-  res.json({
-    yourProtectedResource: "profit"
-  });
+app.get('/index.html',(req, res) => 
+{
+  indexRouter
+});
+
+
+app.route('/documents').get( function(req, res) 
+{
+    fs.readFile(__dirname + '/index.html', 'utf8', function(err, html)
+    {
+        if(err){
+            console.log(err);
+        }else{
+            res.send( 
+              html
+            );
+        }
+    });
 });
 
 
