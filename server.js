@@ -20,6 +20,7 @@ app.use('/users', users);
 app.use('/items', items);
 
 const passport = require('passport');
+const { send } = require('process');
 const BasicStrategy = require('passport-http').BasicStrategy;
 
 passport.use(new BasicStrategy(
@@ -42,9 +43,9 @@ passport.use(new BasicStrategy(
   }
 ));
 
-app.get('/index.html',(req, res) => 
+app.get('',(req, res) => 
 {
-  indexRouter
+  res.send("/Welcome, /documents give you more details on Api:)");
 });
 
 
