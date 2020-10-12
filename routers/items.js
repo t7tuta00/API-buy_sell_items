@@ -1,8 +1,11 @@
 const express = require('express');
+const parseobj = require('xml2js');
+
 let router = express.Router();
 const db = require('./db');
 
 const passport = require('passport');
+const { render } = require('ejs');
 const BasicStrategy = require('passport-http').BasicStrategy;
 
 /*let ItemsData = [
@@ -43,21 +46,121 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 
 router
 .route('')
-.get((req, res) => {
+.get((req, res) => 
+{
     //res.json({ItemsData});
+    
+    const builder = new parseobj.Builder();
 
-    db.query('SELECT * FROM items').then(results => {
-        res.json({ ItemsData: results})
-    })
-    .catch(() => {
-        res.sendStatus(500);
-    })
+    async function changeXML(result2)
+    {
+        async function xmlLoop()
+        {
+            var result2;
+            await db.query('SELECT * FROM items').then(results => 
+                {
+                    //res.json({ ItemsData: results})
+                    //res.send(xml);
+                    result2 = {ItemsData:results};
+                    
+                    //res.json({ ItemsData: results});
+                })
+                .catch(() => {
+                    res.sendStatus(500);
+                })
+    
+            //console.log(result2);
+            return result2;    
+        }
+
+        var result3 = await xmlLoop();
+        var result4="All Items:";
+        var xml = builder.buildObject(result3);
+
+        for (i=0;i<result3.ItemsData.length;i++)
+        {
+            var xml = builder.buildObject(result3.ItemsData[i]);
+            var image1 = result3.ItemsData[i].image1;
+            var image2 = result3.ItemsData[i].image2;
+            var image3 = result3.ItemsData[i].image3;
+            var image4 = result3.ItemsData[i].image4;
+
+            image1 = "<img src=\""+image1+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+            image2 = "<img src=\""+image2+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+            image3 = "<img src=\""+image3+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+            image4 = "<img src=\""+image4+"\" style= \""+"width:128px;height:128px"+"\"\/>";
+
+            result4 = result4+"<h1>"+image1+image2+image3+image4+"</h1>" + xml;
+        }
+    
+        /*var image1 = result3.ItemsData[0].image1;
+        var image2 = result3.ItemsData[0].image2;
+        var image3 = result3.ItemsData[0].image3;
+        var image4 = result3.ItemsData[0].image4;
+
+        image1 = "<img src=\""+image1+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image2 = "<img src=\""+image2+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image3 = "<img src=\""+image3+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image4 = "<img src=\""+image4+"\" style= \""+"width:128px;height:128px"+"\"\/>";*/
+
+        //result3 = "<h1>"+image1+image2+image3+image4+"</h1>"+xml
+        //console.log(result3);
+        res.send(result4);
+    }
+
+    changeXML();
+    
 });
 
 router
 .route('/:id')
 .get((req, res) => {
-    let params = req.params;
+
+    const builder = new parseobj.Builder();
+
+    async function changeXML(result2)
+    {
+        async function xmlLoop()
+        {
+            var result2;
+            await db.query('SELECT * FROM items WHERE id =?',[req.params.id]).then(results => 
+                {
+                    //res.json({ ItemsData: results})
+                    //res.send(xml);
+                    result2 = {ItemsData:results};
+                    
+                    //res.json({ ItemsData: results});
+                })
+                .catch(() => {
+                    res.sendStatus(500);
+                })
+    
+            //console.log(result2);
+            return result2;    
+        }
+
+        var result3 = await xmlLoop();
+        var xml = builder.buildObject(result3);
+        console.log(result3);
+    
+        var image1 = result3.ItemsData[0].image1;
+        var image2 = result3.ItemsData[0].image2;
+        var image3 = result3.ItemsData[0].image3;
+        var image4 = result3.ItemsData[0].image4;
+
+        image1 = "<img src=\""+image1+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image2 = "<img src=\""+image2+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image3 = "<img src=\""+image3+"\" style= \""+"width:128px;height:128px"+"\" \/>";
+        image4 = "<img src=\""+image4+"\" style= \""+"width:128px;height:128px"+"\"\/>";
+
+        result3 = "<h1>"+image1+image2+image3+image4+"</h1>"+xml
+        console.log(result3);
+        res.send(result3);
+    }
+
+    changeXML();
+    
+    /* let params = req.params;
     console.log(params.id)
 
     db.query('SELECT * FROM items WHERE id =?',[req.params.id]).then(results => {
@@ -66,7 +169,8 @@ router
     })
     .catch(() => {
         res.sendStatus(500);
-    })
+    })*/
+
     /*let params = req.params;
     console.log(params.id)
     //ItemsData = ItemsData[params.id]
@@ -79,11 +183,21 @@ router
     passport.authenticate('basic', { session: false }),
     (req, res) => {
 
-        //MISSING ID-COUNTER
-
-        console.log(req.body.id);
-        db.query('INSERT INTO items(title,description,category,location,images,askingprice,dateofposting,deliverytype,sellername,sellermail,sellerphonenumber)VALUES (?,?,?,?,?,?,?,?,?,?,?)'
-        ,[req.body.title,req.body.description,req.body.category,req.body.location,req.body.images,req.body.askingprice,req.body.dateofposting,req.body.deliverytype,req.body.sellername,req.body.sellermail,req.body.sellerphonenumber]);
+        db.query('INSERT INTO items(title,description,category,location,askingprice,dateofposting,deliverytype,sellername,sellermail,sellerphonenumber,image1,image2,image3,image4)VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        ,[req.body.title
+        ,req.body.description
+        ,req.body.category
+        ,req.body.location
+        ,req.body.askingprice
+        ,req.body.dateofposting
+        ,req.body.deliverytype
+        ,req.body.sellername
+        ,req.body.sellermail
+        ,req.body.sellerphonenumber
+        ,req.body.image1
+        ,req.body.image2
+        ,req.body.image3
+        ,req.body.image4]);
           
     /*ItemsData.push({
         id: ItemsData.length,
@@ -171,8 +285,8 @@ router
     (req,res) => {
     
 
-        db.query('UPDATE items SET title = ?,description = ?,category = ?,location = ?,images = ?,askingprice = ?,dateofposting = ?,deliverytype = ?,sellername = ?,sellermail = ?,sellerphonenumber = ? WHERE id = ?'
-        ,[req.body.title,req.body.description,req.body.category,req.body.location,req.body.images,req.body.askingprice,req.body.dateofposting,req.body.deliverytype,req.body.sellername,req.body.sellermail,req.body.sellerphonenumber,req.params.id]);
+        db.query('UPDATE items SET title = ?,description = ?,category = ?,location = ?,askingprice = ?,dateofposting = ?,deliverytype = ?,sellername = ?,sellermail = ?,sellerphonenumber = ?, image1 = ?, image2 = ?,image3 = ?,image4 = ? WHERE id = ?'
+        ,[req.body.title,req.body.description,req.body.category,req.body.location,req.body.askingprice,req.body.dateofposting,req.body.deliverytype,req.body.sellername,req.body.sellermail,req.body.sellerphonenumber,req.body.image1,req.body.image2,req.body.image3,req.body.image4,req.params.id]);
         res.sendStatus(201);
 
         /*ItemsData[Itemid.id] = 

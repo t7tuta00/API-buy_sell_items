@@ -33,7 +33,7 @@ describe('test operations User', function()
   var storedresponse;
   var storedLenght;
 
-  
+  /*
   describe('User Get-,Post-,Delete-methods', function() 
   {
 
@@ -143,14 +143,13 @@ describe('test operations User', function()
       })
   })
 
-});
+});*/
 
 console.log('Go on?');
 var i1 = scanf("%s");
 
 describe('test operations Items', function() 
 {
-
   before(function() 
   {
     server.start();
@@ -345,7 +344,7 @@ describe('test operations Items', function()
 
 console.log('Go on?');
 var i2 = scanf("%s");
-
+/*
 describe('test operations Users/search', function() 
 {
 
@@ -514,6 +513,6 @@ describe('test operations Users/search', function()
     
 
 
-    })
+    })*/
   });
 

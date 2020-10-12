@@ -11,6 +11,7 @@ const users = require('./routers/users');
 const items = require('./routers/items');
 const users2 = require('./routers/users2');
 const db = require('./routers/db');
+//const imageUpload = require('./routers/imageupload');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 //app.use('/login', login);
 app.use('/users', users);
 app.use('/items', items);
+//app.use('/fileUpload', imageUpload);
 
 const passport = require('passport');
 const { send } = require('process');
