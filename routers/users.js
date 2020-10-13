@@ -77,14 +77,11 @@ router
 .delete(
     passport.authenticate('basic', { session: false }),
     (req, res) => {
-        //itemv = parseInt(req.params)-1;
         db.query('DELETE FROM users WHERE id = ?',[req.params.id]);
         db.query('ALTER TABLE users AUTO_INCREMENT=?',[(req.params.id-1)]); 
         /*let Itemid = req.params;
-    
         console.log(Itemid.id);
         console.log(ItemsData[Itemid.id]);
-
         ItemsData.splice(Itemid.id,ItemsData.length);
         console.log(ItemsData);*/
         res.sendStatus(200);

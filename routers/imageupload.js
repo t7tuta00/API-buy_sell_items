@@ -4,6 +4,14 @@ const multer  = require('multer')
 const multerUpload = multer({ dest: 'uploads/' })
 const router = express.Router();
 
+
+/**
+ * UNUSED
+ * 
+ * 
+ */
+
+ /*
 router.get('/', (req, res) => {
     res.send("Only POST method accepted with multipart file");
 })
@@ -33,6 +41,6 @@ router.post('/multiple', multerUpload.array('testFiles', 4), (req, res) => {
       res.send("Test");
     });    */
 
-});
+//});
 
-module.exports = router;
+//module.exports = router;

@@ -47,9 +47,22 @@ passport.use(new BasicStrategy(
 
 app.get('',(req, res) => 
 {
-  res.send("/Welcome, /documents give you more details on Api:)");
+  res.send("/Welcome, go to /main Login:{tester,testerpassword}");
 });
 
+app.route('/main').get(passport.authenticate('basic',{ session: false }), function(req, res)
+{
+    fs.readFile(__dirname + '/mainpage.html', 'utf8', function(err, html)
+    {
+        if(err){
+            console.log(err);
+        }else{
+            res.send( 
+              html
+            );
+        }
+    });
+});
 
 app.route('/documents').get( function(req, res) 
 {
@@ -64,6 +77,8 @@ app.route('/documents').get( function(req, res)
         }
     });
 });
+
+
 
 
 let apiInstance = null;

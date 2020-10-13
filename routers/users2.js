@@ -6,9 +6,9 @@ const { json } = require('body-parser');
 const { count } = require('console');
 let router = express.Router();
 
-let users = [
+/*let users = [
   {
-    /*id: 1,
+    id: 1,
     username: "tester",
     email: "tester@mail.com",
     password: "$2y$06$PhZ74dT8/5g6B8SgssFq6ey4ojLxmP6pos2DcevMUGw25Vc9jGEou", 
@@ -18,7 +18,7 @@ let users = [
     city: "testcity",
     country: "testland",
     dateofbirth: "12.12.1990",
-    validApiKey: null*/
+    validApiKey: null
     
   }
   
@@ -34,7 +34,7 @@ let userObject = {
     "email": "Apina@gmail.com",
     "password": "Salis12",
     "dateofbirth": "12.12.1990"
-};
+};*/
 
 module.exports = {
   //getUserById: (id) => users.find(u => u.id == id),
@@ -44,13 +44,9 @@ module.exports = {
     var username2;
     
     var results = await db.query('SELECT * FROM users;');
-    //console.log(results);
     
     results2= results.find(u => u.username == username)
     username2 = results2.username;
-
-    console.log(username2);
-    console.log(username);
 
     if (username2 == username)
       {
@@ -63,7 +59,13 @@ module.exports = {
       }
   },
 
-  /*resetApiKey: (userId) => {
+  addUser: (username, email, password,name,streetaddress,city,country,dateofbirth) => {
+    db.query('INSERT INTO users(username,email,password,name,streetaddress,city,country,dateofbirth)VALUES (?,?,?,?,?,?,?,?)'
+    ,[username,email,password,name,streetaddress,city,country,dateofbirth]);
+    console.log("201,created");
+  }
+
+/*resetApiKey: (userId) => {
     const user = users.find(u => u.id == userId);
     if(user === undefined)
     {
@@ -93,15 +95,7 @@ module.exports = {
   getAllUsers: () => {
 
       return users;
-  },*/
-
-  //toimii
-  addUser: (username, email, password,name,streetaddress,city,country,dateofbirth) => {
-    db.query('INSERT INTO users(username,email,password,name,streetaddress,city,country,dateofbirth)VALUES (?,?,?,?,?,?,?,?)'
-    ,[username,email,password,name,streetaddress,city,country,dateofbirth]);
-    console.log("201,created");
-  }
-
-  
+  },*/  
 
 }
+

@@ -1,6 +1,7 @@
 const express = require('express');
 const parseobj = require('xml2js');
 
+
 let router = express.Router();
 const db = require('./db');
 
@@ -90,27 +91,34 @@ router
             image3 = "<img src=\""+image3+"\" style= \""+"width:128px;height:128px"+"\" \/>";
             image4 = "<img src=\""+image4+"\" style= \""+"width:128px;height:128px"+"\"\/>";
 
-            result4 = result4+"<h1>"+image1+image2+image3+image4+"</h1>" + xml;
+            result4 = result4 +"<h1>"+image1+image2+image3+image4+"</h1>" + xml;
         }
     
-        /*var image1 = result3.ItemsData[0].image1;
-        var image2 = result3.ItemsData[0].image2;
-        var image3 = result3.ItemsData[0].image3;
-        var image4 = result3.ItemsData[0].image4;
-
-        image1 = "<img src=\""+image1+"\" style= \""+"width:128px;height:128px"+"\" \/>";
-        image2 = "<img src=\""+image2+"\" style= \""+"width:128px;height:128px"+"\" \/>";
-        image3 = "<img src=\""+image3+"\" style= \""+"width:128px;height:128px"+"\" \/>";
-        image4 = "<img src=\""+image4+"\" style= \""+"width:128px;height:128px"+"\"\/>";*/
-
-        //result3 = "<h1>"+image1+image2+image3+image4+"</h1>"+xml
-        //console.log(result3);
         res.send(result4);
     }
 
     changeXML();
     
 });
+
+router
+.route('/objectresponse')
+.get(passport.authenticate('basic', { session: false }),
+(req,res) => {
+    //console.log(category2.category)
+    db.query('SELECT * FROM items')
+    .then(ItemsData => {
+        res.json({ItemsData});
+        console.log(ItemsData);
+        })
+        .catch(() => {
+            res.sendStatus(500);
+        })
+    
+    // var result = ItemsData.filter(obj => obj.category === category2.category)
+    // console.log(result)
+    //res.json({result});
+    })
 
 router
 .route('/:id')
@@ -176,6 +184,25 @@ router
     //ItemsData = ItemsData[params.id]
     res.json(ItemsData[params.id]);*/
 });
+
+router
+.route('/objectresponse/:id')
+.get(passport.authenticate('basic', { session: false }),
+(req,res) => {
+    //console.log(category2.category)
+    db.query('SELECT * FROM items WHERE id =?',[req.params.id])
+    .then(ItemsData => {
+        res.json({ItemsData});
+        console.log(ItemsData);
+        })
+        .catch(() => {
+            res.sendStatus(500);
+        })
+    
+    // var result = ItemsData.filter(obj => obj.category === category2.category)
+    // console.log(result)
+    //res.json({result});
+    })
 
 router
 .route('/create')
